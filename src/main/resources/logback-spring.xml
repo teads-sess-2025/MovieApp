@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOGS" value="./logs" />
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1}): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/application.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/archived/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- JSON appender for ELK stack (Docker profile) -->
+    <springProfile name="docker">
+        <appender name="JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOGS}/application-json.log</file>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeMdc>true</includeMdc>
+                <includeContext>false</includeContext>
+                <customFields>{"application":"summerschool","environment":"docker"}</customFields>
+            </encoder>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOGS}/archived/application-json-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>3GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+    </springProfile>
+
+    <!-- Default profile (local development) -->
+    <springProfile name="!docker &amp; !production">
+        <!-- LOG everything at INFO level -->
+        <root level="info">
+            <appender-ref ref="File" />
+            <appender-ref ref="Console" />
+        </root>
+
+        <!-- LOG "com.teads.summerschool*" at TRACE level -->
+        <logger name="com.teads.summerschool" level="trace" additivity="false">
+            <appender-ref ref="File" />
+            <appender-ref ref="Console" />
+        </logger>
+    </springProfile>
+
+    <!-- Docker profile logging -->
+    <springProfile name="docker">
+        <!-- LOG everything at INFO level -->
+        <root level="info">
+            <appender-ref ref="File" />
+            <appender-ref ref="Console" />
+            <appender-ref ref="JSON" />
+        </root>
+
+        <!-- LOG "com.teads.summerschool*" at DEBUG level -->
+        <logger name="com.teads.summerschool" level="debug" additivity="false">
+            <appender-ref ref="File" />
+            <appender-ref ref="Console" />
+            <appender-ref ref="JSON" />
+        </logger>
+    </springProfile>
+</configuration>

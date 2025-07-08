@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/movies")
 public class TestControler {
     private final MovieClient movieClient;
 
@@ -25,6 +25,13 @@ public class TestControler {
     @GetMapping("/find")
     public List<Movie> findMovie(@RequestParam String name) {
         return movieClient.getMovieByName(name);
+    }
+
+
+
+    @GetMapping("/streaming")
+    public List<Provider> streamMovie(@RequestParam int id) {
+        return movieClient.getMovieProvider(id);
     }
 
 }
