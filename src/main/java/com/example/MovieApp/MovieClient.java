@@ -29,10 +29,8 @@ public class MovieClient {
         this.searchTimer = meterRegistry.timer("search_timer");
     }
 
-
-    public String getMovies() {
-
-        return restClient.get().uri("/discover/movie").retrieve().body(String.class);
+    public List<Movie> getMovies() {
+        return restClient.get().uri("/discover/movie").retrieve().body(Response.class).results();
     }
 
     public List<Movie> getMovieByName(@RequestParam String name) {
@@ -45,6 +43,10 @@ public class MovieClient {
         var result = restClient.get().uri(String.format("movie/%d/watch/providers", id)).retrieve().body(ProviderResponse.class).results().US().flatrate();
         searchTimer.record(System.currentTimeMillis() - startTime, TimeUnit.MILLISECONDS);
         return result;
+    }
+
+    public List<MovieVideo> getMovieVideos(@RequestParam int movieId) {
+        return restClient.get().uri(String.format("movie/%d/videos?language=en-US", movieId)).retrieve().body(VideoResponse.class).results();
     }
 
 }
