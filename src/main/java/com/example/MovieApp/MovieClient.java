@@ -33,6 +33,10 @@ public class MovieClient {
         return restClient.get().uri("/discover/movie").retrieve().body(Response.class).results();
     }
 
+    public MovieDetails getMovie(@RequestParam String id) {
+        return restClient.get().uri(String.format("movie/%s?language=en-US", id)).retrieve().body(MovieDetails.class);
+    }
+
     public List<Movie> getMovieByName(@RequestParam String name) {
         searchCounter.increment();
         return restClient.get().uri(String.format("search/movie?query=%s&include_adult=false&language=en-US&page=1", name)).retrieve().body(Response.class).results();
