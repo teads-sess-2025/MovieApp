@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +31,25 @@ public class MovieClient {
     }
 
     public List<Movie> getMovies() {
-        return restClient.get().uri("/discover/movie").retrieve().body(Response.class).results();
+        List<Movie> allMovies = new ArrayList<>();
+
+        // Fetch the first 3 pages
+        for (int page = 1; page <= 5; page++) {
+            int finalPage = page;
+            Response response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/discover/movie")
+                            .queryParam("page", finalPage)
+                            .build())
+                    .retrieve()
+                    .body(Response.class);
+
+            if (response != null && response.results() != null) {
+                allMovies.addAll(response.results());
+            }
+        }
+
+        return allMovies;
     }
 
     public MovieDetails getMovie(@RequestParam String id) {
