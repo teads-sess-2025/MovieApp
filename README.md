@@ -1,6 +1,7 @@
 # MovieApp
 
 A Spring Boot application for managing movie playlists and fetching movie data from The Movie Database (TMDB) API. This project was developed as part of the Teads Summer School program.
+Frontend part of this project: [MovieApp Fontend](https://github.com/teads-sess-2025/MovieAppFrontend)
 
 ## Features
 
